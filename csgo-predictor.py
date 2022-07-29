@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn.compose
+from sklearn import svm, tree
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier, NearestCentroid
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, KBinsDiscretizer
 from sklearn.metrics import ConfusionMatrixDisplay, f1_score, accuracy_score
@@ -45,10 +48,63 @@ training_data, test_data = train_test_split(df, train_size=0.75)
 # bomb_planted_games.plot(kind='bar', color = ['green', 'red'], title="Partidas com bomba plantada x Partidas sem bomba plantada.")
 # plt.show()
 
-rf = RandomForestClassifier(random_state=21,max_depth=200,n_estimators=200, n_jobs=-1)
-rf.fit(X_train, y_train)
-rf_pred = rf.predict(X_test)
+# --------RANDOM FOREST---------------
 
-# print(rf)
+rf = RandomForestClassifier(random_state=21,max_depth=200,n_estimators=200, n_jobs=-1)
+rf_pred = rf.fit(X_train, y_train).predict(X_test)
+print("RANDOM FOREST:")
 print("Accuracy: ", accuracy_score(y_test, rf_pred))
 print("F1: ", f1_score(y_test, rf_pred, average='weighted'))
+
+# --------GAUSSIAN NAIVE BAYES---------------
+gnb = GaussianNB()
+gnb_pred = gnb.fit(X_train, y_train).predict(X_test)
+print("GAUSSIAN NAIVE BAYES:")
+print("Accuracy: ", accuracy_score(y_test, gnb_pred))
+print("F1: ", f1_score(y_test, gnb_pred, average='weighted'))
+
+# --------SUPPORT VECTOR MACHINE---------------
+# clf = svm.SVC()
+# svm_pred = clf.fit(X_train, y_train).predict(X_test)
+# print("SUPPORT VECTOR MACHINE:")
+# print("Accuracy: ", accuracy_score(y_test, svm_pred))
+# print("F1: ", f1_score(y_test, svm_pred, average='weighted'))
+
+# --------DECISION TREE---------------
+dt = tree.DecisionTreeClassifier()
+dt_pred = dt.fit(X_train, y_train).predict(X_test)
+print("DECISION TREE:")
+print("Accuracy: ", accuracy_score(y_test, dt_pred))
+print("F1: ", f1_score(y_test, dt_pred, average='weighted'))
+
+# PLOTAR A ARVORE DE DECISAO?
+# tree.plot_tree(dt_pred)
+
+# --------K-NEAREST NEIGHBORS---------------
+knn = KNeighborsClassifier(n_neighbors=20, n_jobs=-1)
+knn_pred = knn.fit(X_train, y_train).predict(X_test)
+print("K-NEAREST NEIGHBORS:")
+print("Accuracy: ", accuracy_score(y_test, knn_pred))
+print("F1: ", f1_score(y_test, knn_pred, average='weighted'))
+
+# Print Confusion Matrixes
+
+randomForestCM = ConfusionMatrixDisplay.from_predictions(y_test, rf_pred, cmap=plt.cm.Blues, normalize='true', colorbar=False)
+randomForestCM.ax_.set_title('Random Forest')
+print(randomForestCM)
+plt.show()
+
+naiveBayesCM = ConfusionMatrixDisplay.from_predictions(y_test, gnb_pred, cmap=plt.cm.Blues, normalize='true', colorbar=False)
+naiveBayesCM.ax_.set_title('Naive Bayes (Gaussian)')
+print(naiveBayesCM)
+plt.show()
+
+decisionTreeCM = ConfusionMatrixDisplay.from_predictions(y_test, dt_pred, cmap=plt.cm.Blues, normalize='true', colorbar=False)
+decisionTreeCM.ax_.set_title('Decision Tree')
+print(decisionTreeCM)
+plt.show()
+
+knnCM = ConfusionMatrixDisplay.from_predictions(y_test, knn_pred, cmap=plt.cm.Blues, normalize='true', colorbar=False)
+knnCM.ax_.set_title('K-Nearest Neighbors')
+print(knnCM)
+plt.show()
